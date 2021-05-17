@@ -33,23 +33,9 @@ router.post('/register', checkPasswordLength, checkUsernameFree, (req, res, next
  */
 
 router.post('/login', checkUsernameExists, (req, res, next) => {
-
+  const { username } = req.body;
+  res.json({ status: 200, message: `Welcome ${username}!` });
 });
-/**
-  2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
-
-  response:
-  status 200
-  {
-    "message": "Welcome sue!"
-  }
-
-  response on invalid credentials:
-  status 401
-  {
-    "message": "Invalid credentials"
-  }
- */
 
 router.get('/logout', (req, res, next) => {
 

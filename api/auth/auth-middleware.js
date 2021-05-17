@@ -1,4 +1,5 @@
 const Users = require('../users/users-model');
+const bcrypt = require('bcryptjs');
 
 function restricted(req, res, next) {
   if (req.session.user) {
@@ -16,20 +17,24 @@ function restricted(req, res, next) {
     "message": "Username taken"
   }
 */
-function checkUsernameFree() {
+function checkUsernameFree(req, res, next) {
 
 }
 
-/*
-  If the username in req.body does NOT exist in the database
-
-  status 401
-  {
-    "message": "Invalid credentials"
-  }
-*/
-function checkUsernameExists() {
-
+function checkUsernameExists(req, res, next) {
+  const { username, password } = req.body;
+  Users.findBy({ username })
+    .then(([user]) => {
+      if (user && bcrypt.compareSync(password, user.password)) { // this step also compares the password
+        req.session.user = user;
+        next();
+      } else {
+        next({ status: 401, message: 'Invalid credentials' });
+      }
+    })
+    .catch(err => {
+      next(err);
+    })
 }
 
 /*
@@ -40,7 +45,7 @@ function checkUsernameExists() {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength() {
+function checkPasswordLength(req, res, next) {
 
 }
 
