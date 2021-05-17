@@ -9,23 +9,26 @@ function restricted(req, res, next) {
   }
 }
 
-/*
-  If the username in req.body already exists in the database
-
-  status 422
-  {
-    "message": "Username taken"
-  }
-*/
 function checkUsernameFree(req, res, next) {
-
+  const { username } = req.body;
+  Users.findBy({ username })
+    .then((users) => {
+      if (users.length > 0) {
+        next({ status: 422, message: 'Username taken' });
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    })
 }
 
 function checkUsernameExists(req, res, next) {
   const { username, password } = req.body;
   Users.findBy({ username })
     .then(([user]) => {
-      if (user && bcrypt.compareSync(password, user.password)) { // this step also compares the password
+      if (user && bcrypt.compareSync(password, user.password)) { // this step also verifies the password
         req.session.user = user;
         next();
       } else {
@@ -37,16 +40,13 @@ function checkUsernameExists(req, res, next) {
     })
 }
 
-/*
-  If password is missing from req.body, or if it's 3 chars or shorter
-
-  status 422
-  {
-    "message": "Password must be longer than 3 chars"
-  }
-*/
 function checkPasswordLength(req, res, next) {
-
+  const { password } = req.body;
+  if (password.length < 4) {
+    next({ status: 422, message: 'Passwsord must be longer than 3 chars' });
+  } else {
+    next();
+  }
 }
 
 module.exports = {

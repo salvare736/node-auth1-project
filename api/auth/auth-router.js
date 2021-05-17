@@ -5,32 +5,22 @@ const {
   checkUsernameExists,
   checkPasswordLength
 } = require('./auth-middleware');
+const bcrypt = require('bcryptjs');
 
 router.post('/register', checkPasswordLength, checkUsernameFree, (req, res, next) => {
-
+  const { username, password } = req.body;
+  const hash = bcrypt.hashSync(
+    password,
+    8
+  );
+  Users.add({ username, password: hash })
+    .then(user => {
+      res.status(200).json(user);
+    })
+    .catch(err => {
+      next(err);
+    })
 });
-/**
-  1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
-
-  response:
-  status 200
-  {
-    "user_id": 2,
-    "username": "sue"
-  }
-
-  response on username taken:
-  status 422
-  {
-    "message": "Username taken"
-  }
-
-  response on password three chars or less:
-  status 422
-  {
-    "message": "Password must be longer than 3 chars"
-  }
- */
 
 router.post('/login', checkUsernameExists, (req, res, next) => {
   const { username } = req.body;
@@ -50,6 +40,14 @@ router.get('/logout', (req, res, next) => {
   } else {
     res.json({ message: 'no session' });
   }
+});
+
+router.use((err, req, res, next) => { // eslint-disable-line
+  res.status(err.status || 500).json({
+    message: err.message,
+    stack: err.stack,
+    customMessage: 'Something went wrong inside the auth router'
+  });
 });
 
 module.exports = router;
