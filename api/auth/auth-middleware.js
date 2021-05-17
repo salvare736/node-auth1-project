@@ -1,13 +1,11 @@
-/*
-  If the user does not have a session saved in the server
+const Users = require('../users/users-model');
 
-  status 401
-  {
-    "message": "You shall not pass!"
+function restricted(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    next({ status: 401, message: 'You shall not pass!' });
   }
-*/
-function restricted() {
-
 }
 
 /*
@@ -46,4 +44,9 @@ function checkPasswordLength() {
 
 }
 
-// Don't forget to add these to the `exports` object so they can be required in other modules
+module.exports = {
+  restricted,
+  checkUsernameFree,
+  checkUsernameExists,
+  checkPasswordLength
+}
