@@ -6,6 +6,9 @@ const {
   checkPasswordLength
 } = require('./auth-middleware');
 
+router.post('/register', checkPasswordLength, checkUsernameFree, (req, res, next) => {
+
+});
 /**
   1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
 
@@ -29,7 +32,9 @@ const {
   }
  */
 
+router.post('/login', checkUsernameExists, (req, res, next) => {
 
+});
 /**
   2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
 
@@ -46,7 +51,9 @@ const {
   }
  */
 
+router.get('/logout', (req, res, next) => {
 
+});
 /**
   3 [GET] /api/auth/logout
 
