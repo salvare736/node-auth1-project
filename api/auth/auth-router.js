@@ -38,22 +38,18 @@ router.post('/login', checkUsernameExists, (req, res, next) => {
 });
 
 router.get('/logout', (req, res, next) => {
-
+  if (req.session.user) {
+    const { username } = req.session.user
+    req.session.destroy(err => {
+      if (err) {
+        res.json({ message: `you cannot leave, ${username}` });
+      } else {
+        res.json({ message: 'logged out' });
+      }
+    })
+  } else {
+    res.json({ message: 'no session' });
+  }
 });
-/**
-  3 [GET] /api/auth/logout
-
-  response for logged-in users:
-  status 200
-  {
-    "message": "logged out"
-  }
-
-  response for not-logged-in users:
-  status 200
-  {
-    "message": "no session"
-  }
- */
 
 module.exports = router;
